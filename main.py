@@ -44,7 +44,7 @@ class ContactCreate(BaseModel):
     name: str
     phone_number: str
     email: str
-    
+
 @app.post('/contacts/')
 def create_contact(contact: ContactCreate):
     db = session()
@@ -68,5 +68,22 @@ def create_contact(contact: ContactCreate):
     return {'message': f'Contact with id {db_contact.id} created !'}
 
 # Define the put endpoint update_contact (/contacts/{contact_id})
+class ContactUpdate(BaseModel):
+    name: Optional[str]
+    phone_number: Optional[str]
+    email: Optional[str]
+
+@app.put('/contacts/{contact_id}')
+def update_contact(contact_id: int, contact: ContactUpdate):
+    db = session()
+    db_contact = db.query(Contact).filter(Contact.id == contact_id).first()
+    
+    if db_contact is None:
+        raise HTTPException(status_code=404, detail='Contact not found')
+    
+    for field, value in contact.dict(exclude_unset=True).items():
+        setattr(db_contact, field, value)
+    db.commit()
+    return {'message': f'Contact with id {contact_id} has been updated !'}
 
 # Define the delete endpoint delete_contact (/contacts/{contact_id})
