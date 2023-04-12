@@ -23,6 +23,11 @@ Base.metadata.create_all(engine)
 
 app = FastAPI()
 
+# Define the root endpoint
+@app.get('/')
+def index():
+    return 'Simple REST API for a contact list application'
+
 # Define the get endpoint list_all_contacts (/contacts/)
 @app.get('/contacts/')
 def list_all_contacts():
