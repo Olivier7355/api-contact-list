@@ -52,4 +52,23 @@ def test_update_contact():
     assert contact.phone_number == "222222"
 
 # Define the test_delete_contact
+def test_delete_contact():
+    
+    # Create a contact
+    contact_data = {
+        "name": "Pierre Durand",
+        "phone_number": "33333333",
+        "email": "pierred@test.com"
+    }
+    response = client.post("/contacts/", json=contact_data)
+    assert response.status_code == 200
 
+    # Delete the contact
+    response = client.delete("/contacts/3")
+
+    # Check that the contact was deleted
+    assert response.status_code == 200
+    assert response.json() == {"message": "Contact with id 3 has been deleted !" }
+    db = session()
+    contact = db.query(Contact).filter(Contact.name == "Pierre Durand").first()
+    assert contact is None
