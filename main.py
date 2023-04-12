@@ -87,3 +87,14 @@ def update_contact(contact_id: int, contact: ContactUpdate):
     return {'message': f'Contact with id {contact_id} has been updated !'}
 
 # Define the delete endpoint delete_contact (/contacts/{contact_id})
+@app.delete('/contacts/{contact_id}')
+def delete_contact(contact_id: int):
+    db = session()
+    db_contact = db.query(Contact).filter(Contact.id == contact_id).first()
+    
+    if db_contact is None:
+        raise HTTPException(status_code=404, detail='Contact not found !')
+    
+    db.delete(db_contact)
+    db.commit()
+    return {'message': f'Contact with id {contact_id} has been deleted !'}
