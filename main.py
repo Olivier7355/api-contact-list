@@ -21,9 +21,23 @@ class Contact(Base):
 
 Base.metadata.create_all(engine)
 
+app = FastAPI()
+
 # Define the get endpoint list_all_contacts (/contacts/)
+@app.get('/contacts/')
+def list_all_contacts():
+    db = session()
+    contacts = db.query(Contact).all()
+    return contacts
 
 # Define the get endpoint read_contact (/contacts/{contact_id})
+@app.get('/contacts/{contact_id}')
+def read_contact(contact_id: int):
+    db = session()
+    contact = db.query(Contact).filter(Contact.id == contact_id).first()
+    if contact is None:
+        raise HTTPException(status_code=404, detail='Contact not found !')
+    return contact
 
 # Define the post endpoint create_contact (/contacts/)
 
