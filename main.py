@@ -40,6 +40,32 @@ def read_contact(contact_id: int):
     return contact
 
 # Define the post endpoint create_contact (/contacts/)
+class ContactCreate(BaseModel):
+    name: str
+    phone_number: str
+    email: str
+    
+@app.post('/contacts/')
+def create_contact(contact: ContactCreate):
+    db = session()
+
+    # Validate the contact information
+    if not contact.name:
+        raise HTTPException(status_code=400, detail="Name field cannot be empty")
+    if not contact.phone_number:
+        raise HTTPException(status_code=400, detail="Phone number field cannot be empty")
+    if not contact.email:
+        raise HTTPException(status_code=400, detail="Email field cannot be empty")
+    elif not re.match(r"[^@]+@[^@]+\.[^@]+", contact.email):
+        raise HTTPException(status_code=400, detail="Invalid email format")
+     
+    # Add the contact information into the database 
+    db_contact = Contact(name=contact.name, phone_number=contact.phone_number, email=contact.email)
+    db.add(db_contact)
+    db.commit()
+    db.refresh(db_contact)
+
+    return {'message': f'Contact with id {db_contact.id} created !'}
 
 # Define the put endpoint update_contact (/contacts/{contact_id})
 
